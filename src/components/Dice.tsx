@@ -1,32 +1,41 @@
 interface DiceProps {
   currentPlayerName: string;
+  playerAName: string;
+  playerBName: string;
+  playerAPosition: number;
+  playerBPosition: number;
   value: number | null;
   isRolling: boolean;
   disabled: boolean;
   onRoll: () => void;
 }
 
-const Dice = ({ currentPlayerName, value, isRolling, disabled, onRoll }: DiceProps) => (
-  <section className="dice-card card">
-    <div className="section-heading">
-      <div>
-        <h2>掷骰时刻</h2>
-        <p>轮到 {currentPlayerName} 行动，点击按钮决定这一步会飞多远。</p>
-      </div>
-      <span className="section-badge">{isRolling ? '投掷中' : '等待掷骰'}</span>
+const Dice = ({
+  currentPlayerName,
+  playerAName,
+  playerBName,
+  playerAPosition,
+  playerBPosition,
+  value,
+  isRolling,
+  disabled,
+  onRoll
+}: DiceProps) => (
+  <div className="dice-hub">
+    <div className="dice-hub__label">轮到 {currentPlayerName}</div>
+    <div className={`dice-orb ${isRolling ? 'dice-orb--rolling' : ''}`}>{value ?? '?'}</div>
+    <button
+      className={`primary-button dice-hub__button ${isRolling ? 'dice-hub__button--rolling' : ''}`}
+      onClick={onRoll}
+      disabled={disabled}
+    >
+      {isRolling ? '掷骰中...' : '掷骰子'}
+    </button>
+    <div className="dice-hub__progress">
+      <span>{playerAName}：{playerAPosition}</span>
+      <span>{playerBName}：{playerBPosition}</span>
     </div>
-
-    <div className="dice-panel">
-      <div className={`dice-face ${isRolling ? 'dice-face--rolling' : ''}`}>{value ?? '?'}</div>
-      <button
-        className={`primary-button dice-button ${isRolling ? 'dice-button--rolling' : ''}`}
-        onClick={onRoll}
-        disabled={disabled}
-      >
-        {isRolling ? '骰子旋转中...' : '掷骰子'}
-      </button>
-    </div>
-  </section>
+  </div>
 );
 
 export default Dice;

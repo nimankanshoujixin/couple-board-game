@@ -1,22 +1,32 @@
 import { useEffect, useState } from 'react';
-import type { GameSettings } from '../types/game';
+import type { GameSettings, PlayerKey } from '../types/game';
 
 interface SettingsPanelProps {
   open: boolean;
   settings: GameSettings;
+  currentPlayerName: string;
+  nextPlayerName: string;
+  positions: Record<PlayerKey, number>;
+  lastRoll: number | null;
   onClose: () => void;
   onSave: (settings: GameSettings) => void;
   onRestart: () => void;
   onClearLocalData: () => void;
+  onOpenTaskEditor: () => void;
 }
 
 const SettingsPanel = ({
   open,
   settings,
+  currentPlayerName,
+  nextPlayerName,
+  positions,
+  lastRoll,
   onClose,
   onSave,
   onRestart,
-  onClearLocalData
+  onClearLocalData,
+  onOpenTaskEditor
 }: SettingsPanelProps) => {
   const [draft, setDraft] = useState<GameSettings>(settings);
 
@@ -36,12 +46,33 @@ const SettingsPanel = ({
         <div className="section-heading">
           <div>
             <h2>游戏设置</h2>
-            <p>修改后会保存在当前浏览器中，刷新页面也能继续接着玩。</p>
+            <p>这里集中放对局信息、玩法说明和所有设置入口。</p>
           </div>
           <button className="ghost-button" onClick={onClose}>
             关闭
           </button>
         </div>
+
+        <section className="settings-section">
+          <h3>当前对局</h3>
+          <div className="settings-summary">
+            <p>当前回合：{currentPlayerName}</p>
+            <p>下一位：{nextPlayerName}</p>
+            <p>最近点数：{lastRoll ?? '尚未掷出'}</p>
+            <p>{settings.playerNames.A}：第 {positions.A} 格</p>
+            <p>{settings.playerNames.B}：第 {positions.B} 格</p>
+          </div>
+        </section>
+
+        <section className="settings-section">
+          <h3>玩法说明</h3>
+          <div className="settings-summary">
+            <p>玩家 A 先手，点击中间的掷骰按钮后按点数前进。</p>
+            <p>落到某格会弹出这一格对应的任务，完成后切换下一位。</p>
+            <p>开启精确到达时，超过终点会停留原地，不触发新任务。</p>
+            <p>所有任务、设置和进度都只保存在当前浏览器中。</p>
+          </div>
+        </section>
 
         <div className="settings-grid">
           <label className="field">
@@ -97,7 +128,7 @@ const SettingsPanel = ({
           <label className="switch-field">
             <div>
               <strong>必须精确到达终点</strong>
-              <p>开启后，超过终点会停留原地，本回合不会触发新的格子任务。</p>
+              <p>开启后，超过终点会停留原地。</p>
             </div>
             <input
               type="checkbox"
@@ -110,30 +141,14 @@ const SettingsPanel = ({
               }
             />
           </label>
-
-          <label className="switch-field">
-            <div>
-              <strong>显示任务预览</strong>
-              <p>开启后，棋盘上会显示每一格的简短任务摘要。</p>
-            </div>
-            <input
-              type="checkbox"
-              checked={draft.showTaskPreview}
-              onChange={(event) =>
-                setDraft((previous) => ({
-                  ...previous,
-                  showTaskPreview: event.target.checked
-                }))
-              }
-            />
-          </label>
         </div>
 
-        <div className="notice-card">
-          修改棋盘长度后，会按新的长度重新开始当前对局；任务编辑内容会继续保留。
-        </div>
+        <div className="notice-card">修改棋盘长度后，会按新的长度重新开始当前对局。</div>
 
         <div className="panel-actions">
+          <button className="ghost-button" onClick={onOpenTaskEditor}>
+            打开任务编辑
+          </button>
           <button className="secondary-button" onClick={onRestart}>
             重新开始本局
           </button>

@@ -5,7 +5,6 @@ import SettingsPanel from './components/SettingsPanel';
 import TaskEditor from './components/TaskEditor';
 import TaskModal from './components/TaskModal';
 import VictoryModal from './components/VictoryModal';
-import { useLocalStorage } from './hooks/useLocalStorage';
 import type { GameSettings, GameState, PendingTask, TasksMap } from './types/game';
 import {
   checkWinner,
@@ -19,8 +18,6 @@ import {
 import { clearLocalData, loadGameState, loadTasks, saveGameState, saveTasks } from './utils/storage';
 import { getDefaultTasks, getTaskForCell, normalizeTasks } from './utils/tasks';
 
-const GUIDE_OPEN_STORAGE_KEY = 'couple-flight-chess.guide-open';
-
 const App = () => {
   const [tasks, setTasks] = useState<TasksMap>(() => normalizeTasks(loadTasks(getDefaultTasks())));
   const [gameState, setGameState] = useState<GameState>(() =>
@@ -29,7 +26,6 @@ const App = () => {
   const [isRolling, setIsRolling] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [taskEditorOpen, setTaskEditorOpen] = useState(false);
-  const [showGuide, setShowGuide] = useLocalStorage<boolean>(GUIDE_OPEN_STORAGE_KEY, false);
   const rollTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -52,9 +48,6 @@ const App = () => {
   const nextPlayerName = gameState.settings.playerNames[getNextPlayer(gameState.currentPlayer)];
   const winnerName = gameState.winner ? gameState.settings.playerNames[gameState.winner] : '';
   const canRoll = !isRolling && !gameState.pendingTask && !gameState.winner;
-
-  const progressA = Math.min(100, (gameState.positions.A / gameState.settings.boardLength) * 100);
-  const progressB = Math.min(100, (gameState.positions.B / gameState.settings.boardLength) * 100);
 
   const restartGame = (skipConfirm = false) => {
     if (!skipConfirm && !window.confirm('确定重新开始当前对局吗？当前进度会被重置。')) {
@@ -164,123 +157,36 @@ const App = () => {
     clearLocalData();
     setTasks(getDefaultTasks());
     setGameState(createInitialGameState(DEFAULT_SETTINGS));
-    setShowGuide(false);
     setSettingsOpen(false);
     setTaskEditorOpen(false);
     setIsRolling(false);
   };
 
   return (
-    <main className="app-shell">
-      <section className="topbar card">
-        <div className="topbar__title">
-          <span className="hero-card__eyebrow">Couple Board Game</span>
-          <h1>情侣飞行棋</h1>
-          <p>打开就是对局，任务、设置和进度都只保存在本地浏览器。</p>
-        </div>
-
-        <div className="topbar__status">
-          <div className="turn-pill">
-            <span>当前回合</span>
-            <strong>{currentPlayerName}</strong>
-          </div>
-          <div className="topbar__actions">
-            <button className="ghost-button" onClick={() => setShowGuide((previous) => !previous)}>
-              {showGuide ? '收起玩法' : '玩法说明'}
-            </button>
-            <button className="ghost-button" onClick={() => setTaskEditorOpen(true)}>
-              任务编辑
-            </button>
-            <button className="ghost-button" onClick={() => setSettingsOpen(true)}>
-              设置
-            </button>
-            <button className="secondary-button" onClick={() => restartGame()}>
-              重新开始
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {showGuide ? (
-        <section className="guide-card card">
-          <div className="guide-card__header">
-            <h2>玩法说明</h2>
-            <span className="section-badge">默认折叠</span>
-          </div>
-          <div className="guide-grid">
-            <p>玩家 A 先手，点击“掷骰子”后按点数前进。</p>
-            <p>落到某格会弹出该玩家对应任务，完成后轮到下一位。</p>
-            <p>开启精确到达时，超过终点会停留原地，不触发新任务。</p>
-            <p>任务内容、棋盘长度、玩家名称和进度都会自动保存在本地。</p>
-          </div>
-        </section>
-      ) : null}
-
-      <section className="dashboard-grid">
-        <article className="race-card card">
-          <div className="section-heading">
-            <div>
-              <h2>甜蜜赛况</h2>
-              <p>谁先抵达第 {gameState.settings.boardLength} 格，谁就赢下这一局。</p>
-            </div>
-            <span className="section-badge">
-              {gameState.settings.exactFinish ? '精确到达开启' : '轻松模式'}
-            </span>
-          </div>
-
-          <div className="progress-list">
-            <div className="progress-row">
-              <div className="progress-row__label">
-                <span className="token token--A">A</span>
-                <strong>{gameState.settings.playerNames.A}</strong>
-                <span>{gameState.positions.A} / {gameState.settings.boardLength}</span>
-              </div>
-              <div className="progress-track progress-track--A">
-                <div className="progress-track__fill" style={{ width: `${progressA}%` }} />
-              </div>
-            </div>
-
-            <div className="progress-row">
-              <div className="progress-row__label">
-                <span className="token token--B">B</span>
-                <strong>{gameState.settings.playerNames.B}</strong>
-                <span>{gameState.positions.B} / {gameState.settings.boardLength}</span>
-              </div>
-              <div className="progress-track progress-track--B">
-                <div className="progress-track__fill" style={{ width: `${progressB}%` }} />
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <article className="summary-card card">
-          <span className="status-card__label">对局状态</span>
-          <strong>{currentPlayerName} 准备行动</strong>
-          <p>下一位：{nextPlayerName}</p>
-          <p>最近点数：{gameState.lastRoll ?? '尚未掷出'}</p>
-          <p>{gameState.settings.showTaskPreview ? '棋盘任务预览已开启' : '棋盘任务预览已关闭'}</p>
-        </article>
-      </section>
-
-      <Dice
-        currentPlayerName={currentPlayerName}
-        value={gameState.lastRoll}
-        isRolling={isRolling}
-        disabled={!canRoll}
-        onRoll={handleRoll}
-      />
+    <main className="app-shell app-shell--minimal">
+      <button className="settings-fab" onClick={() => setSettingsOpen(true)} aria-label="打开设置">
+        ⚙
+      </button>
 
       <Board
         settings={gameState.settings}
         positions={gameState.positions}
         currentPlayer={gameState.currentPlayer}
         lastMovedTo={gameState.lastMovedTo}
-        tasks={tasks}
+        centerContent={
+          <Dice
+            currentPlayerName={currentPlayerName}
+            playerAName={gameState.settings.playerNames.A}
+            playerBName={gameState.settings.playerNames.B}
+            playerAPosition={gameState.positions.A}
+            playerBPosition={gameState.positions.B}
+            value={gameState.lastRoll}
+            isRolling={isRolling}
+            disabled={!canRoll}
+            onRoll={handleRoll}
+          />
+        }
       />
-
-      <footer className="privacy-note">
-        所有内容只保存在当前浏览器的 localStorage 中，不会上传到任何服务器。
-      </footer>
 
       <TaskModal
         open={Boolean(gameState.pendingTask)}
@@ -299,10 +205,18 @@ const App = () => {
       <SettingsPanel
         open={settingsOpen}
         settings={gameState.settings}
+        currentPlayerName={currentPlayerName}
+        nextPlayerName={nextPlayerName}
+        positions={gameState.positions}
+        lastRoll={gameState.lastRoll}
         onClose={() => setSettingsOpen(false)}
         onSave={handleSaveSettings}
         onRestart={() => restartGame()}
         onClearLocalData={handleClearLocalData}
+        onOpenTaskEditor={() => {
+          setSettingsOpen(false);
+          setTaskEditorOpen(true);
+        }}
       />
 
       <TaskEditor
