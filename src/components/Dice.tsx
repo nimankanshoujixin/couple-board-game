@@ -10,14 +10,19 @@ const Dice = ({ currentPlayerName, value, isRolling, disabled, onRoll }: DicePro
   <section className="dice-card card">
     <div className="section-heading">
       <div>
-        <h2>掷骰子</h2>
-        <p>轮到 {currentPlayerName} 行动，点击按钮前进 1 到 6 格。</p>
+        <h2>掷骰时刻</h2>
+        <p>轮到 {currentPlayerName} 行动，点击按钮决定这一步会飞多远。</p>
       </div>
+      <span className="section-badge">{isRolling ? '投掷中' : '等待掷骰'}</span>
     </div>
 
     <div className="dice-panel">
       <div className={`dice-face ${isRolling ? 'dice-face--rolling' : ''}`}>{value ?? '?'}</div>
-      <button className={`primary-button dice-button ${isRolling ? 'dice-button--rolling' : ''}`} onClick={onRoll} disabled={disabled}>
+      <button
+        className={`primary-button dice-button ${isRolling ? 'dice-button--rolling' : ''}`}
+        onClick={onRoll}
+        disabled={disabled}
+      >
         {isRolling ? '骰子旋转中...' : '掷骰子'}
       </button>
     </div>

@@ -81,7 +81,7 @@ const TaskEditor = ({ open, boardLength, tasks, onClose, onSave }: TaskEditorPro
         <div className="section-heading">
           <div>
             <h2>任务编辑器</h2>
-            <p>当前展示第 1 到第 {boardLength} 格，可直接编辑 A/B 双方任务。</p>
+            <p>当前展示第 1 到第 {boardLength} 格，可分别编辑 A 与 B 的任务内容。</p>
           </div>
           <button className="ghost-button" onClick={onClose}>
             关闭
@@ -94,7 +94,11 @@ const TaskEditor = ({ open, boardLength, tasks, onClose, onSave }: TaskEditorPro
           </button>
           <label className="secondary-button editor-file-button">
             导入任务文件
-            <input type="file" accept="application/json,.json" onChange={(event) => void handleFileImport(event.target.files?.[0] ?? null)} />
+            <input
+              type="file"
+              accept="application/json,.json"
+              onChange={(event) => void handleFileImport(event.target.files?.[0] ?? null)}
+            />
           </label>
           <button
             className="ghost-button"
@@ -114,7 +118,7 @@ const TaskEditor = ({ open, boardLength, tasks, onClose, onSave }: TaskEditorPro
             rows={6}
             value={importText}
             onChange={(event) => setImportText(event.target.value)}
-            placeholder='支持 {"tasks":{"1":{"A":"...","B":"..."}}} 或直接以格子对象为根节点。'
+            placeholder='支持 {"tasks":{"1":{"A":"...","B":"..."}}}，也支持直接以格子对象为根节点。'
           />
         </label>
 

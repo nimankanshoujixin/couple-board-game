@@ -32,12 +32,12 @@ const TaskModal = ({ open, pendingTask, playerName, nextPlayerName, onConfirm }:
               <p>这一格暂无任务。</p>
             )
           ) : (
-            <p>本回合没有前进，也不会触发新的任务。</p>
+            <p>本回合没有前进，因此不会触发新任务。</p>
           )}
         </div>
 
         <button className="primary-button" onClick={onConfirm}>
-          {pendingTask.winnerAfterCompletion ? '完成并查看胜利结果' : `已完成，切换给 ${nextPlayerName}`}
+          {pendingTask.winnerAfterCompletion ? '完成并查看胜利结果' : `已完成，轮到 ${nextPlayerName}`}
         </button>
       </div>
     </div>

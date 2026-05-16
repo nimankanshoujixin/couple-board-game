@@ -36,7 +36,7 @@ const SettingsPanel = ({
         <div className="section-heading">
           <div>
             <h2>游戏设置</h2>
-            <p>这里的配置和当前进度都会保存到本地浏览器。</p>
+            <p>修改后会保存在当前浏览器中，刷新页面也能继续接着玩。</p>
           </div>
           <button className="ghost-button" onClick={onClose}>
             关闭
@@ -97,7 +97,7 @@ const SettingsPanel = ({
           <label className="switch-field">
             <div>
               <strong>必须精确到达终点</strong>
-              <p>开启后，超过终点会停留原地，本回合不触发新任务。</p>
+              <p>开启后，超过终点会停留原地，本回合不会触发新的格子任务。</p>
             </div>
             <input
               type="checkbox"
@@ -114,7 +114,7 @@ const SettingsPanel = ({
           <label className="switch-field">
             <div>
               <strong>显示任务预览</strong>
-              <p>开启后，棋盘格中会显示 A/B 两位玩家的任务摘要。</p>
+              <p>开启后，棋盘上会显示每一格的简短任务摘要。</p>
             </div>
             <input
               type="checkbox"
@@ -130,7 +130,7 @@ const SettingsPanel = ({
         </div>
 
         <div className="notice-card">
-          修改棋盘长度后，会以新的长度重新开始当前对局；任务编辑内容会保留。
+          修改棋盘长度后，会按新的长度重新开始当前对局；任务编辑内容会继续保留。
         </div>
 
         <div className="panel-actions">

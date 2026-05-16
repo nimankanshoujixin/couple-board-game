@@ -50,18 +50,23 @@ const Board = ({ settings, positions, currentPlayer, lastMovedTo, tasks }: Board
 
   return (
     <section className="board-shell card">
-      <div className="section-heading">
+      <div className="board-shell__backdrop" aria-hidden="true" />
+
+      <div className="section-heading board-shell__heading">
         <div>
-          <h2>甜蜜航线棋盘</h2>
-          <p>{settings.boardLength} 格蛇形路线，终点会在最上方。</p>
+          <h2>甜蜜航线</h2>
+          <p>{settings.boardLength} 格蛇形路线，路径更清晰，手机竖屏也更顺手。</p>
         </div>
-        <span className="section-badge">{settings.showTaskPreview ? '预览开启' : '预览关闭'}</span>
+        <div className="board-badges">
+          <span className="section-badge">{settings.showTaskPreview ? '任务预览开启' : '仅落点显示任务'}</span>
+          <span className="section-badge">终点第 {settings.boardLength} 格</span>
+        </div>
       </div>
 
       <div className="start-strip">
         <div>
-          <strong>起点等待区</strong>
-          <p>还没出发的棋子会停在这里。</p>
+          <strong>起点停机坪</strong>
+          <p>还没出发的棋子会停留在这里，等待下一次甜蜜起飞。</p>
         </div>
         <div className="start-strip__tokens">
           {startPlayers.length > 0 ? (
@@ -74,7 +79,7 @@ const Board = ({ settings, positions, currentPlayer, lastMovedTo, tasks }: Board
               </span>
             ))
           ) : (
-            <span className="start-strip__empty">全部已出发</span>
+            <span className="start-strip__empty">双方都已出发</span>
           )}
         </div>
       </div>
@@ -92,6 +97,7 @@ const Board = ({ settings, positions, currentPlayer, lastMovedTo, tasks }: Board
                 showTaskPreview={settings.showTaskPreview}
                 previewA={getTaskPreview(tasks[cell]?.A ?? '')}
                 previewB={getTaskPreview(tasks[cell]?.B ?? '')}
+                isFinish={cell === settings.boardLength}
               />
             ) : (
               <div key={`${row.rowIndex}-empty-${index}`} className="board-cell board-cell--empty" aria-hidden="true" />
